@@ -6,12 +6,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.grushevskyi.interestingfactsaboutnumbers.databinding.ActivityMainBinding
 import android.content.Intent
 import android.util.Log
-import android.widget.EditText
+import androidx.core.widget.doOnTextChanged
 import kotlinx.coroutines.Dispatchers
 import androidx.lifecycle.lifecycleScope
 import com.android.volley.Request
 import com.android.volley.RequestQueue
-import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import kotlinx.coroutines.launch
 
@@ -21,7 +21,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private var rvAdapter: RVAdapter? = null
     private lateinit var requestQueue: RequestQueue
-    private lateinit var factText: String
+    private var factText: String = ""
+    private var enterNumber: String = ""
+    private val list  = MutableList<String>(0){""}
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,45 +35,58 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         initRV()
 
-        //val view = inflater.inflate(R.layout.fragment_first, container, false)
         requestQueue = Volley.newRequestQueue(this)
-        loadText(binding.editTextEnterNumber.text.toString())
-        binding.buttonGetRandom.setOnClickListener {
-            //loadText(binding.editTextEnterNumber)
-            val myIntent = Intent(this@MainActivity, SecondaryActivity::class.java)
-            myIntent.putExtra("number", binding.editTextEnterNumber.text.toString())
-            myIntent.putExtra("fact", factText)
-            this@MainActivity.startActivity(myIntent)
+        val myIntent = Intent(this@MainActivity, SecondaryActivity::class.java)
+
+        binding.editTextEnterNumber.doOnTextChanged { text, start, count, after ->
+            enterNumber = text.toString()
         }
-        //return view
+
+        binding.buttonGetFact.setOnClickListener{
+            loadText(enterNumber) //binding.editTextEnterNumber.text.toString()
+            list.add(factText)
+            myIntent.putExtra("number", factText.split(" ").get(0))
+            myIntent.putExtra("fact", factText)
+            startActivity(myIntent)
+        }
+
+        binding.buttonGetRandom.setOnClickListener {
+            loadText(enterNumber)
+            list.add(factText)
+            myIntent.putExtra("number", factText.split(" ").get(0))
+            myIntent.putExtra("fact", factText)
+            startActivity(myIntent)
+        }
     }
 
     private fun initRV() {
         binding.rvList.layoutManager = LinearLayoutManager(this)
+        rvAdapter = RVAdapter(ArrayList(list))
         binding.rvList.adapter = rvAdapter
 
         binding.rvList.setOnClickListener {
             val myIntent = Intent(this@MainActivity, SecondaryActivity::class.java)
 
-            this@MainActivity.startActivity(myIntent)
+            startActivity(myIntent)
         }
-
     }
 
     private fun apiCall(editText: String) {
         lifecycleScope.launch(Dispatchers.IO) {
-            var apiUrl: String?
-            if (editText.isBlank()) {
-                apiUrl = "http://numbersapi.com/random/"
-            } else { apiUrl = "http://numbersapi.com/${editText}/" }
 
-            val jsonObjectRequest = JsonObjectRequest(Request.Method.GET, apiUrl, null, {
-                factText = it.getString("text") // -> Will Get Our Intersting fact about random number
+            val apiUrl: String = if (editText.isNullOrBlank()) {
+                "http://numbersapi.com/random/"
+            } else {
+                "http://numbersapi.com/${editText}/"
+            }
 
+            val stringRequest = StringRequest(Request.Method.GET, apiUrl, {
+                factText = it
             }, {
                 Log.d("API Request Error", "${it.printStackTrace()}")
             })
-            requestQueue.add(jsonObjectRequest) // -> Added jsonObjectRequest To requestQueue
+
+            requestQueue.add(stringRequest)
         }
     }
     private fun loadText(editText: String){
@@ -79,6 +94,4 @@ class MainActivity : AppCompatActivity() {
             apiCall(editText)
         }
     }
-
-
 }

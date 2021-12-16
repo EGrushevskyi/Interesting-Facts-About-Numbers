@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:keyboardNavigationCluster="true"
     tools:context=".MainActivity">
 
     <LinearLayout
@@ -22,25 +23,26 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="fill_parent"
-            android:layout_weight="2" >
+            android:layout_weight="2">
 
             <EditText
                 android:id="@+id/editTextEnterNumber"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:autoText="false"
                 android:ems="10"
                 android:gravity="center"
                 android:hint="Enter number..."
                 android:inputType="textPersonName"
-                android:textSize="34sp" />
+                android:textColor="#000000"
+                android:textSize="48sp" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="fill_parent"
-            android:layout_weight="3"
-            >
+            android:layout_weight="3">
 
             <Button
                 android:id="@+id/buttonGetFact"
@@ -57,10 +59,11 @@
                 android:text="Get fact about random number"
                 android:textAlignment="center" />
         </LinearLayout>
+
         <LinearLayout
-            android:layout_weight="2"
+            android:layout_width="match_parent"
             android:layout_height="fill_parent"
-            android:layout_width="match_parent">
+            android:layout_weight="2">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvList"

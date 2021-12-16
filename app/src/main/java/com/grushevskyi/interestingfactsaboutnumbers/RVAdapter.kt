@@ -18,15 +18,15 @@ class RVAdapter (private var mData: ArrayList<String>) : RecyclerView.Adapter<RV
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
-        holder.myFactView.text = mData[position]
+        holder.myNumberView.text = mData[position]
         //holder.myNumberView.text = listOfMyStocks[position]
 
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        var myFactView: TextView = itemView.findViewById(R.id.idFact)
         var myNumberView: TextView = itemView.findViewById(R.id.idNumber)
+        //var myFactView: TextView = itemView.findViewById(R.id.idFact)
 
     }
 }
