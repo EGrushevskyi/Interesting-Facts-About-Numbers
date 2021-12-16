@@ -42,8 +42,10 @@ class MainActivity : AppCompatActivity() {
             enterNumber = text.toString()
         }
 
+        binding.editTextEnterNumber.showSoftInputOnFocus = false
+
         binding.buttonGetFact.setOnClickListener{
-            loadText(enterNumber) //binding.editTextEnterNumber.text.toString()
+            loadText(enterNumber)
             list.add(factText)
             myIntent.putExtra("number", factText.split(" ").get(0))
             myIntent.putExtra("fact", factText)
@@ -51,7 +53,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.buttonGetRandom.setOnClickListener {
-            loadText(enterNumber)
+            loadText("")
             list.add(factText)
             myIntent.putExtra("number", factText.split(" ").get(0))
             myIntent.putExtra("fact", factText)
