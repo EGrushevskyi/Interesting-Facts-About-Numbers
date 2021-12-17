@@ -13,6 +13,8 @@ import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.grushevskyi.interestingfactsaboutnumbers.db.Fact
+import com.grushevskyi.interestingfactsaboutnumbers.db.FactRepository
 import kotlinx.coroutines.launch
 
 
@@ -24,16 +26,25 @@ class MainActivity : AppCompatActivity() {
     private var factText: String = ""
     private var enterNumber: String = ""
     private val list  = MutableList<String>(0){""}
+    val repo: FactRepository by lazy {
+        FactRepository(this)
+    }
+    var fact: Fact? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        binding.rvList.layoutManager = LinearLayoutManager(this)
+        rvAdapter = RVAdapter(ArrayList(list))
+        binding.rvList.adapter = rvAdapter
+
+        binding.editTextEnterNumber.showSoftInputOnFocus = false
     }
 
     override fun onResume() {
         super.onResume()
-        initRV()
 
         requestQueue = Volley.newRequestQueue(this)
         val myIntent = Intent(this@MainActivity, SecondaryActivity::class.java)
@@ -42,11 +53,16 @@ class MainActivity : AppCompatActivity() {
             enterNumber = text.toString()
         }
 
-        binding.editTextEnterNumber.showSoftInputOnFocus = false
-
         binding.buttonGetFact.setOnClickListener{
             loadText(enterNumber)
             list.add(factText)
+            fact?.let {
+                val fact = Fact(
+                    factId = it.factId,
+                    factText = factText
+                )
+                repo.insertFact(fact)
+            }
             myIntent.putExtra("number", factText.split(" ").get(0))
             myIntent.putExtra("fact", factText)
             startActivity(myIntent)
@@ -55,20 +71,15 @@ class MainActivity : AppCompatActivity() {
         binding.buttonGetRandom.setOnClickListener {
             loadText("")
             list.add(factText)
+            fact?.let {
+                val fact = Fact(
+                    factId = it.factId,
+                    factText = factText
+                )
+                repo.insertFact(fact)
+            }
             myIntent.putExtra("number", factText.split(" ").get(0))
             myIntent.putExtra("fact", factText)
-            startActivity(myIntent)
-        }
-    }
-
-    private fun initRV() {
-        binding.rvList.layoutManager = LinearLayoutManager(this)
-        rvAdapter = RVAdapter(ArrayList(list))
-        binding.rvList.adapter = rvAdapter
-
-        binding.rvList.setOnClickListener {
-            val myIntent = Intent(this@MainActivity, SecondaryActivity::class.java)
-
             startActivity(myIntent)
         }
     }
@@ -95,5 +106,10 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch(Dispatchers.Main){
             apiCall(editText)
         }
+    }
+
+    fun fetchFacts() {
+        val allFacts = repo.getAllFacts()
+        rvAdapter?.setFacts(allFacts)
     }
 }
