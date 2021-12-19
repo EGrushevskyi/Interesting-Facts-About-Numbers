@@ -29,7 +29,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:gravity="center"
+                android:gravity="bottom|center"
                 android:text="TextView"
                 android:textColor="#000000"
                 android:textSize="48sp" />
@@ -45,7 +45,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:gravity="center|top"
+                android:gravity="center"
                 android:text="TextView"
                 android:textSize="24sp" />
         </LinearLayout>

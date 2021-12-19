@@ -1,6 +1,5 @@
 package com.grushevskyi.interestingfactsaboutnumbers
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,18 +9,16 @@ import android.content.Intent
 import com.grushevskyi.interestingfactsaboutnumbers.db.Fact
 
 
-class RVAdapter (private var mData: ArrayList<String>) : RecyclerView.Adapter<RVAdapter.ViewHolder>() {
+class RVAdapter : RecyclerView.Adapter<RVAdapter.ViewHolder>() {
 
-    var userList = mutableListOf<Fact>()
-
-    var clickListener: ListClickListener<Fact>? = null
+    var factList = mutableListOf<Fact>()
 
     fun setFacts(facts: List<Fact>) {
-        this.userList = facts.toMutableList()
+        this.factList = facts.toMutableList()
         notifyDataSetChanged()
     }
 
-    override fun getItemCount(): Int = mData.count()
+    override fun getItemCount(): Int = factList.count()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view: View =
@@ -30,33 +27,17 @@ class RVAdapter (private var mData: ArrayList<String>) : RecyclerView.Adapter<RV
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.myNumberView.text = factList[position].factText
 
-        holder.myNumberView.text = mData[position]
-        //holder.myNumberView.text = listOfMyStocks[position]
-
+        holder.itemView.setOnClickListener { v ->
+            val myIntent = Intent(v.context, SecondaryActivity::class.java)
+            myIntent.putExtra("number", factList[position].factText.split(" ").get(0))
+            myIntent.putExtra("fact", factList[position].factText)
+            v.context.startActivity(myIntent)
+        }
     }
 
-    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
-
-        private lateinit var mCtx: Context
-
-        fun quotesAdapter(mCtx: Context) {
-            this.mCtx = mCtx
-        }
-
+    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var myNumberView: TextView = itemView.findViewById(R.id.idNumber)
-        //var myFactView: TextView = itemView.findViewById(R.id.idFact)
-
-
-        override fun onClick(v: View?) {
-            val myIntent = Intent(mCtx, SecondaryActivity::class.java)
-            myIntent.putExtra("quote", quote)
-            startActivity(myIntent)
-        }
-
-    }
-
-    interface ListClickListener<T> {
-        fun onClick(data: T, position: Int)
     }
 }

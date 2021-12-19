@@ -2,6 +2,8 @@ package com.grushevskyi.interestingfactsaboutnumbers.db
 
 import android.content.Context
 import android.os.AsyncTask
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.MainScope
 
 class FactRepository(context: Context) {
 
@@ -12,15 +14,12 @@ class FactRepository(context: Context) {
     }
 
     fun insertFact(fact: Fact) {
-        insertAsyncTask(db).execute(fact)
+        CoroutineTask(db).doOperation(fact)
     }
 
-    private class insertAsyncTask internal constructor(private val factsDao: Dao) :
-        AsyncTask<Fact, Void, Void>() {
-
-        override fun doInBackground(vararg params: Fact): Void? {
+    private class CoroutineTask(private val factsDao: Dao): CoroutineScope by MainScope() {
+        fun doOperation(vararg params: Fact) {
             factsDao.insert(params[0])
-            return null
         }
     }
 }
